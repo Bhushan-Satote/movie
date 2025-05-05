@@ -1,0 +1,63 @@
+@model MovieBooking.Models.User
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Registration</h3>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Registration", "Home", FormMethod.Post, new { @id = "registrationForm" }))
+                    {
+                        <input type="hidden" name="movieId" value="@ViewBag.MovieId" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", type = "tel", required = "required" })
+                            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                            <a href="@Url.Action("Login", "Home", new { movieId = ViewBag.MovieId })" class="btn btn-outline-secondary">
+                                Already have an account? Login
+                            </a>
+                        </div>
+                    }
+
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert @(TempData["IsSuccess"].ToString() == "True" ? "alert-success" : "alert-danger") mt-3">
+                            @TempData["Message"]
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            if (@Json.Serialize(TempData["IsSuccess"] == "True")) {
+                setTimeout(function() {
+                    window.location.href = '@Url.Action("Login", "Home", new { movieId = ViewBag.MovieId })';
+                }, 1500);
+            }
+        });
+    </script>
+}

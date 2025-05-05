@@ -1,0 +1,65 @@
+@model MovieBooking.Models.Movie
+
+<div class="modal-content border-0 rounded-4 overflow-hidden">
+    <div class="modal-header bg-dark text-white border-0">
+        <h5 class="modal-title">@Model.Title</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body p-0">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="@(string.IsNullOrEmpty(Model.PosterURL) ? "/images/no-poster.jpg" : Model.PosterURL)" 
+                     class="img-fluid h-100" style="object-fit: cover;" alt="@Model.Title">
+            </div>
+            <div class="col-md-8">
+                <div class="p-4">
+                    <div class="mb-3">
+                        <span class="badge bg-primary me-2">@Model.Genre</span>
+                        <span class="badge bg-secondary me-2">@Model.Language</span>
+                        <span class="badge bg-info">@Model.Duration min</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-warning d-inline-block me-2">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                if (i <= Model.Rating / 2)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                else if (i - 0.5 <= Model.Rating / 2)
+                                {
+                                    <i class="bi bi-star-half"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
+                            }
+                        </div>
+                        <span class="text-muted">(@Model.Rating/10)</span>
+                    </div>
+                    <p class="text-muted mb-4">@Model.Description</p>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong><i class="bi bi-person"></i> Director:</strong></p>
+                            <p class="text-muted">@Model.Director</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong><i class="bi bi-calendar"></i> Release Date:</strong></p>
+                            <p class="text-muted">@Model.ReleaseDate.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                    </div>
+                    <p class="mb-1"><strong><i class="bi bi-people"></i> Cast:</strong></p>
+                    <p class="text-muted mb-4">@Model.Cast</p>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="@Url.Action("Registration", "Home", new { movieId = Model.Id })" 
+                           class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-ticket-perforated me-2"></i>Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

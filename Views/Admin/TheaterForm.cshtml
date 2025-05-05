@@ -1,0 +1,76 @@
+@model MovieBooking.Models.Theater
+
+@{
+    ViewData["Title"] = ViewData["Action"] + " Theater";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">@ViewData["Action"] Theater</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="@(ViewData["Action"].ToString() == "Add" ? Url.Action("AddTheater") : Url.Action("EditTheater"))">
+                        @if (Model != null && Model.Id > 0)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Theater Name</label>
+                            <input asp-for="Name" class="form-control" required />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label">Location</label>
+                            <input asp-for="Location" class="form-control" required />
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Capacity" class="form-label">Seating Capacity</label>
+                                    <input asp-for="Capacity" type="number" class="form-control" required min="50" max="500" />
+                                    <span asp-validation-for="Capacity" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ScreenType" class="form-label">Screen Type</label>
+                                    <select asp-for="ScreenType" class="form-select" required>
+                                        <option value="">Select Screen Type</option>
+                                        <option value="2D">2D</option>
+                                        <option value="3D">3D</option>
+                                        <option value="IMAX">IMAX</option>
+                                        <option value="4DX">4DX</option>
+                                    </select>
+                                    <span asp-validation-for="ScreenType" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActive" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">@ViewData["Action"] Theater</button>
+                            <a href="@Url.Action("Theaters")" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

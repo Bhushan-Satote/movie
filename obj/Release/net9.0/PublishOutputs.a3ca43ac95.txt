@@ -1,0 +1,9 @@
+D:\movie\bin\Release\net9.0\publish\movie.exe
+D:\movie\bin\Release\net9.0\publish\appsettings.Development.json
+D:\movie\bin\Release\net9.0\publish\appsettings.json
+D:\movie\bin\Release\net9.0\publish\movie.dll
+D:\movie\bin\Release\net9.0\publish\movie.deps.json
+D:\movie\bin\Release\net9.0\publish\movie.runtimeconfig.json
+D:\movie\bin\Release\net9.0\publish\movie.pdb
+D:\movie\bin\Release\net9.0\publish\Newtonsoft.Json.dll
+D:\movie\bin\Release\net9.0\publish\System.Security.Permissions.dll

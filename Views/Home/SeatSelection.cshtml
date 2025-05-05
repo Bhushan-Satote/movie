@@ -1,0 +1,242 @@
+@{
+    ViewData["Title"] = "Select Seats";
+    var movie = ViewBag.Movie;
+    var theater = ViewBag.Theater;
+    var showtime = ViewBag.Showtime;
+    var seatLayout = ViewBag.SeatLayout;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")">Home</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("MovieDetails", new { id = movie.Id })">@movie.Title</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("SelectShowtime", new { movieId = movie.Id, theaterId = theater.Id })">Select Showtime</a></li>
+            <li class="breadcrumb-item active">Select Seats</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Movie and Show Info -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@(string.IsNullOrEmpty(movie.PosterURL) ? "/images/no-poster.jpg" : movie.PosterURL)" 
+                             class="me-3" style="width: 100px; height: 150px; object-fit: cover;" alt="@movie.Title">
+                        <div>
+                            <h5 class="card-title mb-1">@movie.Title</h5>
+                            <p class="text-muted mb-1">@movie.Duration min | @movie.Language</p>
+                            <p class="mb-0">
+                                <i class="bi bi-calendar-event"></i> @showtime.ToString("MMM dd, yyyy")<br>
+                                <i class="bi bi-clock"></i> @showtime.ToString("hh:mm tt")
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6><i class="bi bi-building"></i> Theater Details</h6>
+                    <p class="mb-1"><strong>@theater.Name</strong></p>
+                    <p class="mb-1 text-muted"><i class="bi bi-geo-alt"></i> @theater.Location</p>
+                    <p class="mb-0 text-muted"><i class="bi bi-display"></i> @theater.ScreenType Screen</p>
+                </div>
+            </div>
+
+            <!-- Selected Seats Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Selected Seats:</strong></p>
+                        <p id="selectedSeatsDisplay" class="mb-1">None selected</p>
+                        <p class="mb-1"><strong>Price per Ticket:</strong></p>
+                        <p class="mb-1">$@movie.Price</p>
+                        <p class="mb-1"><strong>Total Amount:</strong></p>
+                        <p id="totalAmount" class="mb-0">$0.00</p>
+                    </div>
+                    <form id="bookingForm" method="post" action="@Url.Action("BookTickets")">
+                        <input type="hidden" name="movieId" value="@movie.Id">
+                        <input type="hidden" name="theaterId" value="@theater.Id">
+                        <input type="hidden" name="showtime" value="@showtime.ToString("o")">
+                        <div id="selectedSeatsContainer"></div>
+                        <button type="submit" class="btn btn-gradient w-100" disabled id="proceedButton">
+                            <i class="bi bi-cart-check"></i> Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Selection -->
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0"><i class="bi bi-grid"></i> Select Seats</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Screen -->
+                    <div class="text-center mb-5">
+                        <div class="screen">
+                            <div class="screen-text">SCREEN</div>
+                        </div>
+                    </div>
+
+                    <!-- Seat Layout -->
+                    <div class="seat-layout">
+                        @{
+                            var seatsPerRow = 10;
+                            for (var i = 0; i < seatLayout.Count; i += seatsPerRow)
+                            {
+                                <div class="seat-row mb-2">
+                                    <div class="row-label">@seatLayout[i][0]</div>
+                                    @for (var j = 0; j < seatsPerRow && (i + j) < seatLayout.Count; j++)
+                                    {
+                                        <div class="seat" data-seat="@seatLayout[i + j]">
+                                            <i class="bi bi-square"></i>
+                                            <span class="seat-number">@seatLayout[i + j]</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <!-- Seat Legend -->
+                    <div class="seat-legend mt-4">
+                        <div class="d-flex justify-content-center gap-4">
+                            <div class="legend-item">
+                                <i class="bi bi-square text-muted"></i> Available
+                            </div>
+                            <div class="legend-item">
+                                <i class="bi bi-square-fill text-primary"></i> Selected
+                            </div>
+                            <div class="legend-item">
+                                <i class="bi bi-square-fill text-danger"></i> Booked
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const selectedSeats = new Set();
+        const pricePerSeat = @movie.Price;
+        
+        // Handle seat selection
+        document.querySelectorAll('.seat').forEach(seat => {
+            seat.addEventListener('click', function() {
+                const seatNumber = this.dataset.seat;
+                
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    selectedSeats.delete(seatNumber);
+                    this.querySelector('i').className = 'bi bi-square';
+                } else {
+                    this.classList.add('selected');
+                    selectedSeats.add(seatNumber);
+                    this.querySelector('i').className = 'bi bi-square-fill';
+                }
+                
+                updateSummary();
+            });
+        });
+        
+        // Update booking summary
+        function updateSummary() {
+            const selectedSeatsArray = Array.from(selectedSeats);
+            const totalAmount = selectedSeatsArray.length * pricePerSeat;
+            
+            document.getElementById('selectedSeatsDisplay').textContent = 
+                selectedSeatsArray.length > 0 ? selectedSeatsArray.join(', ') : 'None selected';
+            document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`;
+            
+            // Update hidden inputs for form submission
+            document.getElementById('selectedSeatsContainer').innerHTML = 
+                selectedSeatsArray.map(seat => 
+                    `<input type="hidden" name="selectedSeats" value="${seat}">`
+                ).join('');
+            
+            // Enable/disable proceed button
+            document.getElementById('proceedButton').disabled = selectedSeatsArray.length === 0;
+        }
+    </script>
+}
+
+<style>
+    .screen {
+        background: linear-gradient(45deg, #1a1a1a, #4e73df);
+        height: 50px;
+        margin: 0 auto;
+        max-width: 600px;
+        border-radius: 5px;
+        position: relative;
+        transform: perspective(100px) rotateX(-5deg);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+    
+    .screen-text {
+        color: white;
+        text-align: center;
+        line-height: 50px;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    
+    .seat-layout {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .row-label {
+        width: 30px;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .seat {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .seat i {
+        font-size: 1.5rem;
+    }
+    
+    .seat:hover {
+        transform: scale(1.1);
+    }
+    
+    .seat.selected i {
+        color: #4e73df;
+    }
+    
+    .seat-number {
+        position: absolute;
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style> 

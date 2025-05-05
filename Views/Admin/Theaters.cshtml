@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = ViewData["PageTitle"];
+}
+
+<div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Theaters</h1>
+        <a href="@Url.Action("AddTheater")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Theater
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Screen Type</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var theater in ViewBag.Theaters)
+                {
+                    <tr>
+                        <td>@theater.Name</td>
+                        <td>@theater.Location</td>
+                        <td>@theater.Capacity seats</td>
+                        <td>@theater.ScreenType</td>
+                        <td>
+                            @if (theater.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("EditTheater", new { id = theater.Id })" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <form method="post" action="@Url.Action("DeleteTheater", new { id = theater.Id })" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this theater?')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+} 

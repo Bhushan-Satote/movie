@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = ViewData["PageTitle"];
+}
+
+<div class="container mt-4">
+    @if (TempData["AdminMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["AdminMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Movies</h5>
+                    <p class="card-text display-4">@ViewBag.MovieCount</p>
+                    <a href="@Url.Action("Movies", "Admin")" class="btn btn-light">Manage Movies</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Theaters</h5>
+                    <p class="card-text display-4">@ViewBag.TheaterCount</p>
+                    <a href="@Url.Action("Theaters", "Admin")" class="btn btn-light">Manage Theaters</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("AddMovie", "Admin")" class="btn btn-primary">Add New Movie</a>
+                        <a href="@Url.Action("AddTheater", "Admin")" class="btn btn-success">Add New Theater</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+} 

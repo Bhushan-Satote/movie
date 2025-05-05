@@ -1,0 +1,122 @@
+@using System.Linq
+@{
+    ViewData["Title"] = "Select Showtime";
+    var movie = ViewBag.Movie;
+    var theater = ViewBag.Theater;
+    var showtimes = ViewBag.Showtimes;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index")">Home</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("MovieDetails", new { id = movie.Id })">@movie.Title</a></li>
+            <li class="breadcrumb-item active">Select Showtime</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Movie Summary -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@(string.IsNullOrEmpty(movie.PosterURL) ? "/images/no-poster.jpg" : movie.PosterURL)" 
+                             class="me-3" style="width: 100px; height: 150px; object-fit: cover;" alt="@movie.Title">
+                        <div>
+                            <h5 class="card-title mb-1">@movie.Title</h5>
+                            <p class="text-muted mb-1">@movie.Duration min | @movie.Language</p>
+                            <div class="text-warning">
+                                @for (var i = 1; i <= 5; i++)
+                                {
+                                    if (i <= movie.Rating / 2)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    else if (i - 0.5 <= movie.Rating / 2)
+                                    {
+                                        <i class="bi bi-star-half"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star"></i>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6><i class="bi bi-building"></i> Theater Details</h6>
+                    <p class="mb-1"><strong>@theater.Name</strong></p>
+                    <p class="mb-1 text-muted"><i class="bi bi-geo-alt"></i> @theater.Location</p>
+                    <p class="mb-0 text-muted"><i class="bi bi-display"></i> @theater.ScreenType Screen</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Showtime Selection -->
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0"><i class="bi bi-calendar3"></i> Select Showtime</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Filter by Date</label>
+                                <select id="dateFilter" class="form-select">
+                                    @{
+                                        var dates = ((List<DateTime>)showtimes).Select(s => s.Date).Distinct().ToList();
+                                        foreach (var date in dates)
+                                        {
+                                            <option value="@date.ToString("yyyy-MM-dd")">
+                                                @date.ToString("MMM dd, ddd")
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="showtime-grid mt-3">
+                        @foreach (var showtime in (List<DateTime>)showtimes)
+                        {
+                            <div class="showtime-item" data-date="@showtime.ToString("yyyy-MM-dd")">
+                                <button onclick="selectShowtime('@showtime.ToString("o")')" 
+                                        class="btn btn-outline-primary w-100 mb-2">
+                                    <i class="bi bi-clock"></i> @showtime.ToString("hh:mm tt")
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Filter showtimes by date
+        document.getElementById('dateFilter').addEventListener('change', function() {
+            const selectedDate = this.value;
+            document.querySelectorAll('.showtime-item').forEach(item => {
+                if (item.dataset.date === selectedDate) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Handle showtime selection
+        function selectShowtime(showtime) {
+            window.location.href = '@Url.Action("SeatSelection")?movieId=@movie.Id&theaterId=@theater.Id&showtime=' + showtime;
+        }
+
+        // Show showtimes for the first date by default
+        document.getElementById('dateFilter').dispatchEvent(new Event('change'));
+    </script>
+} 

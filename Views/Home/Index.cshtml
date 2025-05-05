@@ -1,0 +1,348 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero Section with Dynamic Background -->
+<div class="hero-section position-relative overflow-hidden mb-5 w-100 vw-100" style="min-height: 70vh; background: linear-gradient(135deg,rgb(3, 9, 14) 0%, #3498db 100%); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); width: 100vw !important;">
+    <div class="hero-background position-absolute w-100 h-100" style="background: url('/images/cinema-bg.jpg') center/cover; opacity: 0.15; filter: saturate(1.2);"></div>
+    <div class="container position-relative py-5 h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-lg-8 text-center text-lg-start">
+                <h1 class="display-2 fw-bold text-white mb-4 animate-text" style="text-shadow: 3px 3px 6px rgba(0,0,0,0.4); letter-spacing: -1px;">
+                    Welcome to Movie Booking
+                </h1>
+                <p class="lead text-white mb-4 animate-text-delay" style="font-size: 1.4rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); font-weight: 300;">
+                    Experience the magic of cinema with our seamless booking platform
+                </p>
+                <div class="d-flex justify-content-center justify-content-lg-start gap-4 animate-text-delay">
+                    <a href="#nowShowing" class="btn btn-primary btn-lg" style="background: linear-gradient(45deg, #e74c3c, #c0392b); border: none; padding: 1rem 2rem; font-weight: 500; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); transition: all 0.3s ease;">
+                        <i class="bi bi-film me-2"></i>Now Showing
+                    </a>
+                    <a href="#comingSoon" class="btn btn-outline-light btn-lg" style="padding: 1rem 2rem; font-weight: 500; border-width: 2px; backdrop-filter: blur(5px); transition: all 0.3s ease;">
+                        <i class="bi bi-calendar-event me-2"></i>Coming Soon
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Now Showing Section -->
+<section id="nowShowing" class="container mb-5 py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="section-title fw-bold position-relative" style="color: #1a237e;">
+                <i class="bi bi-film"></i> Now Showing
+                <span class="position-absolute bottom-0 start-0 w-100" style="height: 4px; background: linear-gradient(45deg, #1e88e5, #1565c0); border-radius: 2px;"></span>
+            </h2>
+            <p class="text-muted lead">Book your favorite movies today</p>
+        </div>
+        <div class="btn-group view-toggle shadow-sm rounded-pill overflow-hidden" role="group">
+            <button class="btn btn-primary active px-4 py-2" data-view="grid" style="background: linear-gradient(45deg, #1e88e5, #1565c0); border: none;">
+                <i class="bi bi-grid"></i>
+            </button>
+            <button class="btn btn-light px-4 py-2" data-view="list">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid View -->
+    <div class="row g-4 fade-in" id="nowShowingGrid">
+        @foreach (var movie in ViewBag.NowShowingMovies)
+        {
+            <div class="col-md-3">
+                <div class="card h-100 movie-card shadow-lg rounded-4 border-0" style="transition: all 0.3s ease;">
+                    <div class="movie-poster position-relative" style="height: 400px;">
+                        <img src="@(string.IsNullOrEmpty(movie.PosterURL) ? "/images/no-poster.jpg" : movie.PosterURL)" 
+                             class="card-img h-100 w-100 object-fit-cover rounded-4"
+                             alt="@movie.Title"
+                             style="filter: brightness(0.95); aspect-ratio: 2/3; object-position: center;"
+                             loading="lazy"
+                             onerror="this.src='/images/no-poster.jpg'">
+                        <div class="movie-overlay position-absolute top-0 start-0 w-100 h-100 rounded-4" 
+                             style="background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%);">
+                            <div class="movie-info p-4 position-absolute bottom-0 start-0 w-100">
+                                <h5 class="movie-title text-white mb-2 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">@movie.Title</h5>
+                                <div class="movie-meta text-white-50 mb-3 d-flex gap-3">
+                                    <span class="d-flex align-items-center text-white"><i class="bi bi-clock me-2 text-white"></i>@movie.Duration min</span>
+                                    <span class="d-flex align-items-center text-white"><i class="bi bi-translate me-2 text-white"></i>@movie.Language</span>
+                                </div>
+                                <div class="movie-rating mb-3">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= movie.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                        else if (i - 0.5 <= movie.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-half text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star text-white"></i>
+                                        }
+                                    }
+                                    <span class="rating-number ms-2 text-white">@movie.Rating/10</span>
+                                </div>
+                                <div class="movie-actions mt-3 d-flex gap-2">
+                                    <a href="@Url.Action("Registration", "Home", new { movieId = movie.Id })" 
+                                       class="btn btn-primary rounded-pill d-flex align-items-center justify-content-center" 
+                                       style="background: linear-gradient(45deg, #1e88e5, #1565c0); border: none; box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3); height: 50px; width: 49%;">
+                                        <i class="bi bi-ticket-perforated me-2 fs-5"></i>
+                                        <span class="fw-medium">Book Now</span>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-light rounded-pill d-flex align-items-center justify-content-center" 
+                                            data-bs-toggle="modal" data-bs-target="#movieDetailsModal"
+                                            onclick="showMovieDetails(@movie.Id)" 
+                                            style="height: 50px; width: 49%; transition: all 0.3s ease; border-width: 2px; background: linear-gradient(45deg, #1e88e5, #1565c0); color: white;">
+                                        <i class="bi bi-info-circle me-2 fs-5"></i>
+                                        <span class="fw-medium">Details</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- List View -->
+    <div class="d-none fade-in" id="nowShowingList">
+        <div class="table-responsive shadow-lg rounded-4 overflow-hidden">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: linear-gradient(45deg, #1e88e5, #1565c0);">
+                    <tr class="text-white">
+                        <th class="py-3 px-4">Movie</th>
+                        <th class="py-3">Duration</th>
+                        <th class="py-3">Language</th>
+                        <th class="py-3">Rating</th>
+                        <th class="py-3 text-end pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var movie in ViewBag.NowShowingMovies)
+                    {
+                        <tr>
+                            <td class="py-3 px-4" style="min-width: 300px;">
+                                <div class="d-flex align-items-center">
+                                    <img src="@(string.IsNullOrEmpty(movie.PosterURL) ? "/images/no-poster.jpg" : movie.PosterURL)" 
+                                         class="rounded-3" style="width: 60px; height: 90px; object-fit: cover;">
+                                    <div class="ms-3">
+                                        <h6 class="mb-1 fw-semibold">@movie.Title</h6>
+                                        <span class="text-muted">@movie.Genre</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@movie.Duration min</td>
+                            <td>@movie.Language</td>
+                            <td>
+                                <div class="text-warning">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= movie.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        else if (i - 0.5 <= movie.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-half"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star"></i>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="@Url.Action("Registration", "Home", new { movieId = movie.Id })" 
+                                   class="btn btn-primary rounded-pill px-4" 
+                                   style="background: linear-gradient(45deg, #1e88e5, #1565c0); border: none;">
+                                    <i class="bi bi-ticket-perforated me-2"></i>Book Now
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Coming Soon Section -->
+<section id="comingSoon" class="container mb-5 py-5">
+    <div class="section-header mb-4">
+        <h2 class="section-title fw-bold" style="color: #1a237e;">
+            <i class="bi bi-calendar-event"></i> Coming Soon
+        </h2>
+        <p class="text-muted lead">Exciting movies coming to theaters</p>
+    </div>
+
+    <div class="row g-4 fade-in">
+        @foreach (var movie in ViewBag.ComingSoonMovies)
+        {
+            <div class="col-md-3">
+                <div class="card h-100 movie-card shadow-sm hover-scale" style="transition: transform 0.3s ease;">
+                    <div class="ribbon ribbon-top-right">
+                        <span style="background: linear-gradient(45deg, #f44336, #d32f2f);">Coming Soon</span>
+                    </div>
+                    <div class="movie-poster">
+                        <img src="@(string.IsNullOrEmpty(movie.PosterURL) ? "/images/no-poster.jpg" : movie.PosterURL)" 
+                             class="card-img" alt="@movie.Title">
+                        <div class="movie-overlay">
+                            <div class="movie-info">
+                                <h5 class="movie-title">@movie.Title</h5>
+                                <div class="movie-meta">
+                                    <span><i class="bi bi-calendar"></i> @movie.ReleaseDate.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                <p class="movie-description">@movie.Description</p>
+                                <button class="btn btn-outline-light btn-sm" onclick="showMovieDetails(@movie.Id)">
+                                    <i class="bi bi-info-circle"></i> More Info
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Movie Details Modal -->
+<div class="modal fade movie-modal" id="movieDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div id="movieDetailsContent">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // View toggle functionality
+        const gridView = document.getElementById('nowShowingGrid');
+        const listView = document.getElementById('nowShowingList');
+        const viewButtons = document.querySelectorAll('.view-toggle .btn');
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const view = button.dataset.view;
+                viewButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                if (view === 'grid') {
+                    gridView.classList.remove('d-none');
+                    listView.classList.add('d-none');
+                } else {
+                    gridView.classList.add('d-none');
+                    listView.classList.remove('d-none');
+                }
+            });
+        });
+
+        // Movie details modal functionality
+        function showMovieDetails(movieId) {
+            const modal = new bootstrap.Modal(document.getElementById('movieDetailsModal'));
+            const contentDiv = document.getElementById('movieDetailsContent');
+            
+            contentDiv.innerHTML = `
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>`;
+            
+            modal.show();
+
+            fetch(`/Home/GetMovieDetails/${movieId}`)
+                .then(response => response.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    contentDiv.innerHTML = `
+                        <div class="alert alert-danger m-4">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Error loading movie details. Please try again.
+                        </div>`;
+                });
+        }
+    </script>
+}
+
+<style>
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+    
+    .movie-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .movie-overlay {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .movie-card:hover .movie-overlay {
+        opacity: 1;
+    }
+    
+    .animate-text {
+        animation: fadeInUp 1s ease;
+    }
+    
+    .animate-text-delay {
+        animation: fadeInUp 1s ease 0.3s forwards;
+        opacity: 0;
+    }
+    
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Additional styles for better UI */
+    .movie-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .movie-meta {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .movie-rating {
+        color: #ffc107;
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+    }
+</style>
+
+
+

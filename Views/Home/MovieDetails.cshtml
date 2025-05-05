@@ -1,0 +1,115 @@
+@model MovieBooking.Models.Movie
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Movie Details -->
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="@(string.IsNullOrEmpty(Model.PosterURL) ? "/images/no-poster.jpg" : Model.PosterURL)" 
+                             class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="@Model.Title">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3">@Model.Title</h2>
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2">@Model.Genre</span>
+                                <span class="badge bg-secondary me-2">@Model.Language</span>
+                                <span class="badge bg-info">@Model.Duration min</span>
+                            </div>
+                            <div class="mb-3">
+                                <div class="text-warning d-inline-block me-2">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Model.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        else if (i - 0.5 <= Model.Rating / 2)
+                                        {
+                                            <i class="bi bi-star-half"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star"></i>
+                                        }
+                                    }
+                                </div>
+                                <span class="text-muted">(@Model.Rating/10)</span>
+                            </div>
+                            <p class="card-text">@Model.Description</p>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="bi bi-person"></i> Director:</strong></p>
+                                    <p class="text-muted">@Model.Director</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="bi bi-calendar"></i> Release Date:</strong></p>
+                                    <p class="text-muted">@Model.ReleaseDate.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                            </div>
+                            <p class="mb-1"><strong><i class="bi bi-people"></i> Cast:</strong></p>
+                            <p class="text-muted">@Model.Cast</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="col-md-4">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0"><i class="bi bi-ticket-perforated"></i> Book Tickets</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Theater</label>
+                        <select id="theaterSelect" class="form-select" required>
+                            <option value="">Choose a theater...</option>
+                            @foreach (var theater in ViewBag.Theaters)
+                            {
+                                <option value="@theater.Id">
+                                    @theater.Name - @theater.Location (@theater.ScreenType)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <div>
+                                <strong>Ticket Price:</strong><br>
+                            ₹@Model.Price per person
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="proceedToShowtime()" class="btn btn-gradient w-100">
+                        <i class="bi bi-calendar-check"></i> Select Showtime
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function proceedToShowtime() {
+            const theaterId = document.getElementById('theaterSelect').value;
+            if (!theaterId) {
+                alert('Please select a theater');
+                return;
+            }
+            
+            window.location.href = '@Url.Action("SelectShowtime")?movieId=@Model.Id&theaterId=' + theaterId;
+        }
+    </script>
+} 

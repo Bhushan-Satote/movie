@@ -1,0 +1,60 @@
+@model MovieBooking.Models.User
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Login</h3>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+                    {
+                        <input type="hidden" id="movieId" name="movieId" value="@ViewBag.MovieId" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", type = "tel", required = "required" })
+                            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", required = "required" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                            <a href="@Url.Action("Registration", "Home")" class="btn btn-outline-secondary">
+                                Don't have an account? Register
+                            </a>
+                        </div>
+                    }
+
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert @(ViewBag.IsSuccess ? "alert-success" : "alert-danger") mt-3">
+                            @ViewBag.Message
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit the form if login was successful
+        @if (ViewBag.IsSuccess == true && ViewBag.MovieId != null)
+        {
+            <text>
+            window.location.href = '@Url.Action("MovieDetails", "Home", new { id = ViewBag.MovieId })';
+            </text>
+        }
+    </script>
+}
