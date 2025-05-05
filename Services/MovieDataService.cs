@@ -45,7 +45,7 @@ namespace MovieBooking.Services
                     ReleaseDate = DateTime.Now.AddDays(-15),
                     Director = "Christopher Nolan",
                     Cast = "Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page",
-                    IsNowShowing = true
+                    IsNowShowing = false
                 }
             };
 
